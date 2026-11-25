@@ -1,8 +1,8 @@
 # makefun-x-reposts-02
 
-[![make.fun](https://make.fun/badge/makefun-x-reposts-02.svg)](https://make.fun/competitions/makefun-x-reposts-02)
-[![rank](https://make.fun/badge/makefun-x-reposts-02/itaro91100/makefun-x-reposts-02/rank.svg)](https://make.fun/competitions/makefun-x-reposts-02)
-[![reward](https://make.fun/badge/makefun-x-reposts-02/reward.svg)](https://make.fun/competitions/makefun-x-reposts-02)
+[![make.fun · makefun-x-reposts-02](https://make.fun/badge/makefun-x-reposts-02.svg)](https://make.fun/bounty/makefun-x-reposts-02?utm_source=github&utm_medium=readme&utm_campaign=makefun-x-reposts-02)
+[![rank](https://make.fun/badge/makefun-x-reposts-02/itaro91100/makefun-x-reposts-02/rank.svg)](https://make.fun/bounty/makefun-x-reposts-02/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=makefun-x-reposts-02)
+[![reward](https://make.fun/badge/makefun-x-reposts-02/itaro91100/makefun-x-reposts-02/reward.svg)](https://make.fun/bounty/makefun-x-reposts-02?utm_source=github&utm_medium=readme&utm_campaign=makefun-x-reposts-02)
 
 Entry for the [makefun-x-reposts-02](https://make.fun/competitions/makefun-x-reposts-02) bounty ($500): repost @makefunai's newest posts on X.
 
