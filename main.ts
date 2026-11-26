@@ -1,32 +1,60 @@
-// main.ts — entrypoint for makefun-x-reposts-02
-// Reads POSTS.json (list form {"posts": [...]}) and prints the seven X post URLs
-// that quote @makefunai posts for this bounty. Node 22, stdlib only.
-import { readFileSync } from "node:fs";
+// main.ts — makefun-x-reposts-02 entrypoint (Node 22, standard library only).
+//
+// The entry is the seven X posts named in POSTS.json: each one quotes a
+// different @makefunai post from the bounty pool and carries this bounty's
+// play code in its own words. The sealed scorer reads POSTS.json out of the
+// output directory, so this program's only job is to carry the file there
+// unchanged: it reads the repository copy, checks every entry looks like an
+// x.com status address, and writes the exact same bytes to the output folder.
+//
+//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// (MAKEFUN_BOT_DIR overrides where POSTS.json is read from; the default is
+// the directory this file lives in. MAKEFUN_OUTPUT_DIR defaults to /output.)
+
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-const here = dirname(fileURLToPath(import.meta.url));
+const scriptFolder = dirname(fileURLToPath(import.meta.url));
+const sourceFolder = process.env.MAKEFUN_BOT_DIR ?? scriptFolder;
+const targetFolder = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const sourcePath = join(sourceFolder, "POSTS.json");
+const targetPath = join(targetFolder, "POSTS.json");
 
-const raw = readFileSync(join(here, "POSTS.json"), "utf8");
-const data: unknown = JSON.parse(raw);
-if (!data || typeof data !== "object" || !Array.isArray((data as { posts?: unknown }).posts)) {
-  throw new Error('POSTS.json must be a list of the form {"posts": [...]}');
-}
-const posts = (data as { posts: unknown[] }).posts;
+const statusPattern = /^https:\/\/x\.com\/[A-Za-z0-9_]+\/status\/[0-9]+$/;
 
-for (const [i, url] of posts.entries()) {
-  if (typeof url !== "string" || url.length === 0) {
-    throw new Error(`posts[${i}] is not a non-empty string`);
+function loadPostList(): { rawText: string; links: string[] } {
+  const rawText = readFileSync(sourcePath, "utf8");
+  const parsed: unknown = JSON.parse(rawText);
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("POSTS.json must hold an object");
   }
-  if (!/^https:\/\/x\.com\/[A-Za-z0-9_]+\/status\/\d+$/.test(url)) {
-    throw new Error(`posts[${i}] is not an x.com status URL: ${url}`);
+  const links = (parsed as { posts?: unknown }).posts;
+  if (!Array.isArray(links)) {
+    throw new Error('POSTS.json must hold {"posts": [...]}');
   }
-  console.log(`${i + 1}. ${url}`);
+  return { rawText, links: links as string[] };
 }
-console.log(`total: ${posts.length} posts`);
 
-// The seven posts each quote a different @makefunai post from the bounty pool
-// (every @makefunai post with id >= 2125053632605196760, threads included),
-// carry @makefunai in their text, and carry this bounty's play code
-// makefun-squash-rabbit-hockey. They stay public until the results are out.
-export { posts };
+function checkLinks(links: string[]): void {
+  if (links.length === 0) {
+    throw new Error("POSTS.json holds no posts");
+  }
+  links.forEach((link, position) => {
+    if (typeof link !== "string" || !statusPattern.test(link)) {
+      throw new Error(`posts[${position}] is not an x.com status URL: ${String(link)}`);
+    }
+  });
+}
+
+function publishCopy(rawText: string, links: string[]): void {
+  mkdirSync(targetFolder, { recursive: true });
+  writeFileSync(targetPath, rawText, "utf8");
+  console.log(`wrote ${links.length} posts to ${targetPath}`);
+}
+
+const { rawText, links } = loadPostList();
+checkLinks(links);
+publishCopy(rawText, links);
+
+export { links as posts };
